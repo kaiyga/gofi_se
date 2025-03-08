@@ -12,4 +12,4 @@ And God bless us!
 
 ---
 
-P.S. If you are wanna contribute to this project, i love it
+P.S. If you wanna contribute to this project, i love it
