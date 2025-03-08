@@ -5,12 +5,10 @@ import (
 	"os"
 	"strings"
 
-	// "github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 
-	// "github.com/charmbracelet/lipgloss"
 	"os/exec"
 
 	"github.com/sahilm/fuzzy"
