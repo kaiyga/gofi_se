@@ -23,9 +23,8 @@
 
       buildInputs = with pkgs; [
         go
-        bubbletea
-        fuzzy
       ];
+      proxyVendor = true;
     };
 
     apps.x86_64-linux.default = {
@@ -34,7 +33,7 @@
     };
 
     devShells.x86_64-linux.default = pkgs.mkShell {
-      buildInputs = with pkgs; [go bubbletea fuzzy];
+      buildInputs = with pkgs; [go gotools];
     };
   };
 }
