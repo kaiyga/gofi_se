@@ -1,4 +1,4 @@
-module zeshi09/tui-launcher
+module zeshi09/gofi_se
 
 go 1.23.6
 
