@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"sort"
 	"strings"
 
 	"github.com/charmbracelet/bubbles/key"
@@ -15,16 +16,6 @@ import (
 	"golang.org/x/term"
 )
 
-type app struct {
-	name        string
-	cmd         string
-	description string
-}
-
-func (a app) Title() string       { return a.name }
-func (a app) Description() string { return a.description }
-func (a app) FilterValue() string { return a.name }
-
 type model struct {
 	list       list.Model
 	apps       []app
@@ -33,10 +24,14 @@ type model struct {
 	searching  bool
 }
 
-var allApps = loadApplications()
 var pinnedApps = make(map[string]bool)
 
 func filterApps(input string, apps []app) []app {
+
+	sort.Slice(apps, func(i, j int) bool {
+		return apps[i].Weight() > apps[j].Weight()
+	})
+
 	if input == "" {
 		return apps
 	}
@@ -81,6 +76,8 @@ func (m *model) updateList() {
 			name:        displayName,
 			description: a.description,
 			cmd:         a.cmd,
+			weight:      a.weight,
+			file:        a.file,
 		}
 
 		if pinnedApps[a.name] {
@@ -144,9 +141,18 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "enter":
 			selected, ok := m.list.SelectedItem().(app)
 			if ok {
-				// fmt.Println("Launching:", selected.cmd)
+				if w, ok := appsWeights[selected.File()]; ok {
+					appsWeights[selected.file] = w + 1
+				} else {
+					appsWeights[selected.file] = 1
+				}
+
+				m.list.Title = fmt.Sprint(selected)
+				saveAppsWeight()
+
 				cmd := exec.Command("setsid", selected.cmd)
 				cmd.Start()
+
 				return m, tea.Quit
 			}
 
@@ -198,13 +204,12 @@ func getTerminalSize() (int, int, error) {
 func main() {
 	clearScreen()
 	loadPinnedApps()
+	allApps := loadApplications()
 
 	width, height, err := getTerminalSize()
 	if err != nil {
 		width, height = 80, 24
 	}
-
-	allApps = loadApplications()
 
 	l := list.New(convertToListItems(allApps), list.NewDefaultDelegate(), width-5, height)
 	l.Title = "Apps"

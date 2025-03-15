@@ -17,8 +17,42 @@ var desktopDirs = []string{
 	"/run/current-system/sw/share/applications",
 }
 
+// Object of application in launcher list
+type app struct {
+	name        string
+	cmd         string
+	description string
+	// .desktop file
+	file   string
+	weight int
+}
+
+// Get count how many times user runned this app
+func (a app) Weight() int { return a.weight }
+
+// Get application .desktop file
+func (a app) File() string { return a.file }
+
+func (a app) Title() string       { return a.name }
+func (a app) Description() string { return a.description }
+func (a app) FilterValue() string { return a.name }
+
+var appsWeights = make(map[string]int)
+var appsWeightFile string = filepath.Join(os.Getenv("HOME"), ".config", "gofi-launcher", "gofi-drun.json")
+
+func saveAppsWeight() { writeToJSON(appsWeightFile, appsWeights) }
+func loadAppsWeight() { loadFromJSON(appsWeightFile, &appsWeights) }
+
 func loadApplications() []app {
 	var apps []app
+	loadAppsWeight()
+
+	for file, weight := range appsWeights {
+		parsedApp, err := parseDesktopFile(file, weight)
+		if err == nil && parsedApp.name != "" {
+			apps = append(apps, parsedApp)
+		}
+	}
 
 	for _, dir := range desktopDirs {
 		home, _ := os.UserHomeDir()
@@ -30,8 +64,9 @@ func loadApplications() []app {
 		}
 
 		for _, file := range files {
-			parsedApp, err := parseDesktopFile(file)
-			if err == nil && parsedApp.name != "" {
+			parsedApp, err := parseDesktopFile(file, 0)
+			_, ok := appsWeights[parsedApp.File()]
+			if err == nil && parsedApp.name != "" && !ok {
 				apps = append(apps, parsedApp)
 			}
 		}
@@ -41,7 +76,7 @@ func loadApplications() []app {
 	return apps
 }
 
-func parseDesktopFile(path string) (app, error) {
+func parseDesktopFile(path string, weight int) (app, error) {
 	file, err := os.Open(path)
 	if err != nil {
 		return app{}, err
@@ -79,5 +114,5 @@ func parseDesktopFile(path string) (app, error) {
 		return app{}, err
 	}
 
-	return app{name: name, description: description, cmd: execCmd}, nil
+	return app{name: name, description: description, cmd: execCmd, weight: weight, file: path}, nil
 }

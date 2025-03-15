@@ -1,8 +1,6 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
 	"os"
 	"path/filepath"
 )
@@ -10,29 +8,9 @@ import (
 var pinnedFile = filepath.Join(os.Getenv("HOME"), ".config", "gofi-launcher", "pinned.json")
 
 func savePinnedApps() {
-	os.MkdirAll(filepath.Dir(pinnedFile), 0755)
-
-	data, err := json.MarshalIndent(pinnedApps, "", " ")
-
-	if err != nil {
-		fmt.Println("Saving pinned apps error:", err)
-	}
-
-	err = os.WriteFile(pinnedFile, data, 0644)
-	if err != nil {
-		fmt.Println("Writing pinned apps error:", err)
-	}
+	writeToJSON(pinnedFile, pinnedApps)
 }
 
 func loadPinnedApps() {
-	data, err := os.ReadFile(pinnedFile)
-	if err != nil {
-		fmt.Println("pinned.json not found, make new")
-		return
-	}
-
-	err = json.Unmarshal(data, &pinnedApps)
-	if err != nil {
-		fmt.Println("Loading pinned.json error:", err)
-	}
+	loadFromJSON(pinnedFile, &pinnedApps)
 }
