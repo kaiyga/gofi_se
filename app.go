@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 )
 
@@ -72,6 +73,10 @@ func loadApplications() []app {
 		}
 
 	}
+
+	sort.Slice(apps, func(i, j int) bool {
+		return apps[i].Weight() > apps[j].Weight()
+	})
 
 	return apps
 }
