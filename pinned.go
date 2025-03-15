@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 )
 
-var pinnedFile = filepath.Join(os.Getenv("HOME"), ".config", "tui-launcher", "pinned.json")
+var pinnedFile = filepath.Join(os.Getenv("HOME"), ".config", "gofi-launcher", "pinned.json")
 
 func savePinnedApps() {
 	os.MkdirAll(filepath.Dir(pinnedFile), 0755)

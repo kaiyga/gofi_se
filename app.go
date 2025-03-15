@@ -9,6 +9,10 @@ import (
 )
 
 var desktopDirs = []string{
+	// Default linux .desktop files
+	"/usr/share/applications/",
+	"~/.local/share/applications/",
+	// NixOS .desktop files
 	"~/.nix-profile/share/applications",
 	"/run/current-system/sw/share/applications",
 }
