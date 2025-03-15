@@ -1,4 +1,4 @@
-module zeshi09/gofi_se
+module zeshi09/gofi-launcher
 
 go 1.23.6
 
