@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"os"
-	"sort"
 	"strings"
 
 	"github.com/charmbracelet/bubbles/key"
@@ -27,10 +26,6 @@ type model struct {
 var pinnedApps = make(map[string]bool)
 
 func filterApps(input string, apps []app) []app {
-
-	sort.Slice(apps, func(i, j int) bool {
-		return apps[i].Weight() > apps[j].Weight()
-	})
 
 	if input == "" {
 		return apps
@@ -141,11 +136,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "enter":
 			selected, ok := m.list.SelectedItem().(app)
 			if ok {
-				if w, ok := appsWeights[selected.File()]; ok {
-					appsWeights[selected.file] = w + 1
-				} else {
-					appsWeights[selected.file] = 1
-				}
+				appsWeights[selected.File()] = selected.Weight() + 1
 
 				m.list.Title = fmt.Sprint(selected)
 				saveAppsWeight()
